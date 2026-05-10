@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { useState } from "react";
 
@@ -12,24 +13,62 @@ type Stock = {
   upside: number;
 };
 
-const won = (v: number) => `${v.toLocaleString("ko-KR")}원`;
-const rate = (v: number) => `${(v * 100).toFixed(2)}%`;
-const plainRate = (v: number) => `${v.toFixed(2)}`;
+const won = (v: number) =>
+  `${v.toLocaleString("ko-KR")}원`;
 
-export default function TopLists({ stocks }: { stocks: Stock[] }) {
-  const holdings = stocks.filter((s) => s.invest > 0);
+const rate = (v: number) =>
+  `${(v * 100).toFixed(2)}%`;
 
-  const profitTop = [...holdings].sort((a, b) => b.profit - a.profit).slice(0, 10);
-  const profitWorst = [...holdings].sort((a, b) => a.profit - b.profit).slice(0, 10);
+const plainRate = (v: number) =>
+  `${v.toFixed(2)}`;
 
-  const rateTop = [...holdings].sort((a, b) => b.profitRate - a.profitRate).slice(0, 10);
-  const rateWorst = [...holdings].sort((a, b) => a.profitRate - b.profitRate).slice(0, 10);
+export default function TopLists({
+  stocks,
+}: {
+  stocks: Stock[];
+}) {
+  const holdings = stocks.filter(
+    (s) => s.invest > 0
+  );
 
-  const investTop = [...holdings].sort((a, b) => b.invest - a.invest).slice(0, 10);
-  const upsideTop = [...stocks].filter((s) => s.upside > 0).sort((a, b) => b.upside - a.upside).slice(0, 10);
+  const profitTop = [...holdings]
+    .sort((a, b) => b.profit - a.profit)
+    .slice(0, 10);
+
+  const profitWorst = [...holdings]
+    .sort((a, b) => a.profit - b.profit)
+    .slice(0, 10);
+
+  const rateTop = [...holdings]
+    .sort(
+      (a, b) =>
+        b.profitRate - a.profitRate
+    )
+    .slice(0, 10);
+
+  const rateWorst = [...holdings]
+    .sort(
+      (a, b) =>
+        a.profitRate - b.profitRate
+    )
+    .slice(0, 10);
+
+  const investTop = [...holdings]
+    .sort((a, b) => b.invest - a.invest)
+    .slice(0, 10);
+
+  const upsideTop = [...stocks]
+    .filter((s) => s.upside > 0)
+    .sort((a, b) => b.upside - a.upside)
+    .slice(0, 10);
+
   const efficiencyTop = [...holdings]
     .filter((s) => s.invest > 0)
-    .sort((a, b) => b.profit / b.invest - a.profit / a.invest)
+    .sort(
+      (a, b) =>
+        b.profit / b.invest -
+        a.profit / a.invest
+    )
     .slice(0, 10);
 
   return (
@@ -40,22 +79,22 @@ export default function TopLists({ stocks }: { stocks: Stock[] }) {
           {
             label: "TOP",
             items: profitTop.map((s) => ({
-  code: s.code,
-  name: s.name,
-  sub: s.sector,
-  value: won(s.profit),
-  raw: s.profit,
-})),
+              code: s.code,
+              name: s.name,
+              sub: s.sector,
+              value: won(s.profit),
+              raw: s.profit,
+            })),
           },
           {
             label: "WORST",
-           items: profitWorst.map((s) => ({
-  code: s.code,
-  name: s.name,
-  sub: s.sector,
-  value: won(s.profit),
-  raw: s.profit,
-})),
+            items: profitWorst.map((s) => ({
+              code: s.code,
+              name: s.name,
+              sub: s.sector,
+              value: won(s.profit),
+              raw: s.profit,
+            })),
           },
         ]}
       />
@@ -66,8 +105,8 @@ export default function TopLists({ stocks }: { stocks: Stock[] }) {
           {
             label: "TOP",
             items: rateTop.map((s) => ({
-               code: s.code,
-                name: s.name,
+              code: s.code,
+              name: s.name,
               sub: s.sector,
               value: rate(s.profitRate),
               raw: s.profitRate,
@@ -76,8 +115,8 @@ export default function TopLists({ stocks }: { stocks: Stock[] }) {
           {
             label: "WORST",
             items: rateWorst.map((s) => ({
-               code: s.code,
-                name: s.name,
+              code: s.code,
+              name: s.name,
               sub: s.sector,
               value: rate(s.profitRate),
               raw: s.profitRate,
@@ -92,8 +131,8 @@ export default function TopLists({ stocks }: { stocks: Stock[] }) {
           {
             label: "투자금",
             items: investTop.map((s) => ({
-               code: s.code,
-                name: s.name,
+              code: s.code,
+              name: s.name,
               sub: s.sector,
               value: won(s.invest),
               raw: s.invest,
@@ -103,8 +142,8 @@ export default function TopLists({ stocks }: { stocks: Stock[] }) {
           {
             label: "업사이드",
             items: upsideTop.map((s) => ({
-               code: s.code,
-               name: s.name,
+              code: s.code,
+              name: s.name,
               sub: s.sector,
               value: plainRate(s.upside),
               raw: s.upside,
@@ -114,10 +153,12 @@ export default function TopLists({ stocks }: { stocks: Stock[] }) {
           {
             label: "효율",
             items: efficiencyTop.map((s) => ({
-               code: s.code,
-               name: s.name,
+              code: s.code,
+              name: s.name,
               sub: s.sector,
-              value: rate(s.profit / s.invest),
+              value: rate(
+                s.profit / s.invest
+              ),
               raw: s.profit / s.invest,
             })),
           },
@@ -144,44 +185,59 @@ function RankingCard({
     }[];
   }[];
 }) {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab, setActiveTab] =
+    useState(0);
+
   const items = tabs[activeTab].items;
 
   return (
     <div className="rounded-2xl border bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <div className="font-bold">{title}</div>
-        <div className="text-xs text-gray-400">{items.length}개</div>
+        <div className="font-bold text-gray-900">
+          {title}
+        </div>
+
+        <div className="text-xs text-gray-500">
+          {items.length}개
+        </div>
       </div>
 
       <div className="mb-3 flex gap-2">
         {tabs.map((tab, index) => (
-  <button
-    key={tab.label}
-    onClick={() => setActiveTab(index)}
-    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-      activeTab === index
-        ? "bg-gray-900 text-white"
-        : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-    }`}
-  >
-    {tab.label}
-  </button>
-))}
+          <button
+            key={tab.label}
+            onClick={() =>
+              setActiveTab(index)
+            }
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+              activeTab === index
+                ? "bg-gray-900 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <div className="space-y-2">
         {items.map((item, index) => (
-          <div key={`${item.name}-${index}`} className="rounded-xl bg-gray-50 p-2">
+          <div
+            key={`${item.name}-${index}`}
+            className="rounded-xl border border-gray-100 bg-gray-50 p-3"
+          >
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <Link
-  href={`/stocks/${item.code}`}
-  className="text-sm font-semibold leading-snug hover:underline"
->
-  {index + 1}. {item.name}
-</Link>
-                <div className="text-xs text-gray-400">{item.sub}</div>
+                  href={`/stocks/${item.code}`}
+                  className="text-sm font-semibold leading-snug text-gray-900 hover:underline"
+                >
+                  {index + 1}. {item.name}
+                </Link>
+
+                <div className="mt-0.5 text-xs text-gray-500">
+                  {item.sub}
+                </div>
               </div>
 
               <div
