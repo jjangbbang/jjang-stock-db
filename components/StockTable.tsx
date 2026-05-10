@@ -43,6 +43,7 @@ export default function StockTable({
   const [search, setSearch] = useState("");
   const [sectorFilter, setSectorFilter] = useState("전체");
   const [statusFilter, setStatusFilter] = useState("전체");
+  const quickStatusTabs = ["전체", "매수", "스윙", "매수대기", "천천히매도", "X완전매도X"];
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteOnly, setFavoriteOnly] = useState(false);
 
@@ -80,15 +81,15 @@ export default function StockTable({
 
   const filteredStocks = useMemo(() => {
     return stocks.filter((s) => {
-      const matchSearch = s.name
-        .toLowerCase()
-        .includes(search.toLowerCase());
+const matchSearch = (s.name ?? "")
+  .toLowerCase()
+  .includes(search.toLowerCase());
 
       const matchSector =
-        sectorFilter === "전체" || s.sector === sectorFilter;
+  sectorFilter === "전체" || (s.sector ?? "") === sectorFilter;
 
-      const matchStatus =
-        statusFilter === "전체" || s.status === statusFilter;
+const matchStatus =
+  statusFilter === "전체" || (s.status ?? "") === statusFilter;
 
       const matchFavorite =
         !favoriteOnly || favorites.includes(s.code);
@@ -171,7 +172,21 @@ export default function StockTable({
           ⭐ 즐겨찾기
         </button>
       </div>
-
+<div className="flex flex-wrap gap-2 px-4 pb-4">
+  {quickStatusTabs.map((tab) => (
+    <button
+      key={tab}
+      onClick={() => setStatusFilter(tab)}
+      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+        statusFilter === tab
+          ? "bg-gray-900 text-white"
+          : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+      }`}
+    >
+      {tab}
+    </button>
+  ))}
+</div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] text-xs md:text-sm">
           <thead className="bg-gray-50 text-gray-500">

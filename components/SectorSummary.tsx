@@ -15,6 +15,9 @@ type SortDirection = "asc" | "desc";
 const won = (v: number) => `${v.toLocaleString("ko-KR")}원`;
 const rate = (v: number) => `${(v * 100).toFixed(2)}%`;
 
+
+
+
 export default function SectorSummary({
   stocks,
   selectedSector,
@@ -26,6 +29,8 @@ export default function SectorSummary({
 }) {
   const [sortKey, setSortKey] = useState<SortKey>("invest");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+
 
   const sectors = useMemo(() => {
     const map = new Map<
@@ -84,7 +89,7 @@ export default function SectorSummary({
       setSortDirection("desc");
     }
   };
-
+  const totalEval = sectors.reduce((sum, s) => sum + s.evalAmount, 0);
   const mark = (key: SortKey) =>
     sortKey === key ? (sortDirection === "asc" ? " ▲" : " ▼") : "";
 
@@ -124,6 +129,7 @@ export default function SectorSummary({
               <Th align="right" onClick={() => handleSort("profitRate")}>
                 수익률{mark("profitRate")}
               </Th>
+              <th className="p-3 text-right">비중</th>
             </tr>
           </thead>
 
@@ -159,6 +165,9 @@ export default function SectorSummary({
                 >
                   {rate(s.profitRate)}
                 </td>
+                <td className="p-3 text-right">
+  {((s.evalAmount / totalEval) * 100).toFixed(2)}%
+</td>
               </tr>
             ))}
           </tbody>

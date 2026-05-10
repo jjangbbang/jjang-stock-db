@@ -28,40 +28,40 @@ export default function KpiCards({
 
   const topItems = [
     {
-      label: "총자산",
+      label: "💰 총자산",
       value: formatWon(dashboard.totalAsset),
     },
     {
-      label: "주식자산",
+      label: "📈 주식자산",
       value: formatWon(evalAmount),
     },
     {
-      label: "연금자산",
+      label: "🏦 연금자산",
       value: formatWon(dashboard.pension),
     },
     {
-      label: "예수금",
+      label: "💵 현금",
       value: formatWon(dashboard.cash),
     },
   ];
 
   const bottomItems = [
     {
-      label: "투자원금",
+      label: "💸 투자금",
       value: formatWon(invest),
     },
     {
-      label: "현재손익",
+      label: "📊 현재손익",
       value: formatWon(profit),
       highlight: profit,
     },
     {
-      label: "수익률",
+      label: "📈 수익률",
       value: formatRate(profitRate),
       highlight: profitRate,
     },
     {
-      label: "연간수익",
+      label: "🪙 연간수익",
       value: formatWon(dashboard.annualProfit),
       highlight: dashboard.annualProfit,
     },
@@ -111,7 +111,9 @@ function KpiCard({
 
   return (
     <div className="rounded-2xl border bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="text-sm text-gray-500">{label}</div>
+<div className="flex items-center gap-1 text-sm text-gray-500">
+  {label}
+</div>
       <div className={`mt-2 text-xl font-bold ${color}`}>
         {value}
       </div>

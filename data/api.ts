@@ -157,18 +157,41 @@ export async function getDashboard() {
     throw new Error("WEB_Dashboard 데이터를 불러오지 못했습니다.");
   }
 
-  const rows: RawDashboard[] = await res.json();
+  const rows = await res.json();
 
-  const map: Record<string, number> = {};
+  const map = new Map<string, string>();
 
-  rows.forEach((row) => {
-    map[row.항목] = toNumber(row.값);
+  rows.forEach((row: any) => {
+    map.set(row["항목"], row["값"]);
   });
 
   return {
-  cash: map["예수금"] || 0,
-  pension: map["연금자산"] || 0,
-  totalAsset: map["총자산"] || 0,
-  annualProfit: map["연수익"] || 0,
-};
+    totalAsset: toNumber(map.get("총자산")),
+    cash: toNumber(map.get("예수금")),
+    pension: toNumber(map.get("연금자산")),
+    annualProfit: toNumber(map.get("연수익")),
+    updatedAt: map.get("업데이트시간"), // 🔥 핵심 추가
+   fireGoal: toNumber(map.get("FIRE목표")),
+  };
+}
+export async function getAssetHistory() {
+  const res = await fetch(
+    `https://opensheet.elk.sh/${SHEET_ID}/WEB_AssetHistory`,
+    { cache: "no-store" }
+  );
+
+  if (!res.ok) {
+    throw new Error("WEB_AssetHistory 데이터를 불러오지 못했습니다.");
+  }
+
+  const rows = await res.json();
+
+  return rows.map((row: any) => ({
+    date: row["날짜"],
+    totalAsset: Number(row["총자산"] || 0),
+    stockAsset: Number(row["주식자산"] || 0),
+    pension: Number(row["연금자산"] || 0),
+    annualProfit: Number(row["연수익"] || 0),
+    cumulativeProfit: Number(row["누적수익금"] || 0),
+  }));
 }

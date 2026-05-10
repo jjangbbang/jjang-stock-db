@@ -7,73 +7,74 @@ import {
   Cell,
   ResponsiveContainer,
   Tooltip,
-  Legend,
 } from "recharts";
 
-type Holding = {
-  account: string;
+type Stock = {
+  sector: string;
   evalAmount: number;
 };
 
-type Props = {
-  holdings?: Holding[];
-  dashboard: {
-    cash: number;
-    pension: number;
-    totalAsset: number;
-  };
-};
-
 const COLORS = [
-  "#8b5cf6",
-  "#ec4899",
-  "#84cc16",
+  "#6366f1",
   "#22c55e",
+  "#f59e0b",
+  "#ef4444",
+  "#14b8a6",
+  "#a855f7",
+  "#0ea5e9",
   "#f97316",
-  "#06b6d4",
 ];
 
-export default function AssetChart({ holdings = [], dashboard }: Props) {
+export default function SectorChart({ stocks }: { stocks: Stock[] }) {
   const data = useMemo(() => {
     const map = new Map<string, number>();
 
-    holdings.forEach((h) => {
-      if (!h.account) return;
-      map.set(h.account, (map.get(h.account) ?? 0) + h.evalAmount);
+    stocks.forEach((s) => {
+      if (!s.sector || s.evalAmount <= 0) return;
+      map.set(s.sector, (map.get(s.sector) ?? 0) + s.evalAmount);
     });
 
-    const result = Array.from(map.entries()).map(([name, value]) => ({
-      name,
-      value,
-    }));
+    return Array.from(map.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value);
+  }, [stocks]);
 
-    if (dashboard.cash > 0) {
-      result.push({ name: "예수금", value: dashboard.cash });
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+
+  const topRatios = useMemo(() => {
+    const major = data
+      .map((item) => ({
+        ...item,
+        percent: total ? (item.value / total) * 100 : 0,
+      }))
+      .filter((item) => item.percent >= 5);
+
+    const etcValue = data
+      .map((item) => ({
+        ...item,
+        percent: total ? (item.value / total) * 100 : 0,
+      }))
+      .filter((item) => item.percent < 5)
+      .reduce((sum, item) => sum + item.value, 0);
+
+    const result = [...major];
+
+    if (etcValue > 0) {
+      result.push({
+        name: "기타",
+        value: etcValue,
+        percent: total ? (etcValue / total) * 100 : 0,
+      });
     }
 
-    if (dashboard.pension > 0) {
-      result.push({ name: "연금자산", value: dashboard.pension });
-    }
-
-    return result.filter((item) => item.value > 0);
-  }, [holdings, dashboard]);
-
-  const total =
-    dashboard.totalAsset || data.reduce((sum, item) => sum + item.value, 0);
-
-  const topRatios = data
-    .map((item) => ({
-      ...item,
-      percent: total ? (item.value / total) * 100 : 0,
-    }))
-    .sort((a, b) => b.percent - a.percent)
-    .slice(0, 6);
+    return result.sort((a, b) => b.percent - a.percent);
+  }, [data, total]);
 
   return (
     <div className="rounded-2xl border bg-white p-4 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-lg font-bold">자산 비중</div>
-        <div className="text-xs text-gray-400">{data.length}개 항목</div>
+        <div className="text-lg font-bold">섹터 비중</div>
+        <div className="text-xs text-gray-400">{data.length}개 섹터</div>
       </div>
 
       <div className="mb-3 flex flex-wrap gap-2">
@@ -119,19 +120,11 @@ export default function AssetChart({ holdings = [], dashboard }: Props) {
                 ];
               }}
             />
-
-            <Legend
-              verticalAlign="bottom"
-              iconType="circle"
-              formatter={(value) => (
-                <span className="text-sm text-gray-700">{String(value)}</span>
-              )}
-            />
           </PieChart>
         </ResponsiveContainer>
 
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pb-10">
-          <div className="text-sm text-gray-500">총자산</div>
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+          <div className="text-sm text-gray-500">주식자산</div>
           <div className="text-xl font-bold">
             {total.toLocaleString("ko-KR")}원
           </div>
